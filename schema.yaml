@@ -1,25 +1,94 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/pulumi/pulumi/master/pkg/codegen/schema/pulumi.json
 ---
-name: xyz
+name: pulumi-aws-vpc
+types:
+  pulumi-aws-vpc:index:SubnetAvailabilityZone:
+    type: object
+    properties:
+      availabilityZone:
+        type: string
+        plain: true
+        description: The availability zone to be deployed into.
+      publicSubnetCidr:
+        type: string
+        plain: true
+        description: Public subnet CIDR block.
+      privateSubnetCidrBlock:
+        type: string
+        plain: true
+        description: Private subnet CIDR block.
+      isolatedSubnetCidrBlock:
+        type: string
+        plain: true
+        description: Isolated subnet CIDR block.
 resources:
-  xyz:index:StaticPage:
+  pulumi-aws-vpc:index:Vpc:
     isComponent: true
     inputProperties:
-      indexContent:
+      cidrBlock:
         type: string
-        description: The HTML content for index.html.
+        plain: true
+        description: The CIDR block for the VPC.
+      createPublicSubnets:
+        type: boolean
+        plain: true
+        description: If set to 'true', public subnets will be created. Defaults to 'true'.
+      createPrivateSubnets:
+        type: boolean
+        plain: true
+        description: If set to 'true', private subnets will be created. Defaults to 'true'.
+      createIsolatedSubnets:
+        type: boolean
+        plain: true
+        description: If set to 'true', isolated subnets will be created. Defaults to 'true'.
+      enableDnsHostnames:
+        type: boolean
+        plain: true
+        description: If set to 'true', DNS hostnames are enbaled in the VPC. Defaults `false`.
+      enableDnsSupport:
+        type: boolean
+        plain: true
+        description: If set to 'true', DNS suppoft is enabled in the VPC. Defaults true.
+      createNatGateways:
+        type: boolean
+        plain: true
+        description: If set to 'true', NAT gateways will be created. Additionally, both public and private subnets must be created. If public
+          subnets are not created, NAT gateways will not be created.
+      subnetAvailabilityZoneConfig:
+        type: array
+        items:
+          "$ref": "#/types/pulumi-aws-vpc:index:SubnetAvailabilityZone"
+          plain: true
+        plain: true
+        description: Array of availability zones and configs which determine where subnets are created, as well as, what type of subnets are created.
     requiredInputs:
-      - indexContent
+      - cidrBlock
     properties:
-      bucket:
-        "$ref": "/aws/v4.0.0/schema.json#/resources/aws:s3%2Fbucket:Bucket"
-        description: The bucket resource.
-      websiteUrl:
+      natGatewaysIds:
+        type: array
+          items:
+            type: string
+          description: Ids of the NAT gateways
+      publicSubnetIds:
+        type: array
+          items:
+            type: string
+          description: Ids of the Public Subnets.
+      privateSubnetIds:
+        type: array
+          items:
+            type: string
+          description: Ids of the Private Subnets.
+      isolatedSubnetIds:
+        type: array
+          items:
+            type: string
+          description: Ids of the Isolated Subnets.
+      vpcId:
         type: string
-        description: The website URL.
+        description: Id of the VPC
     required:
-      - bucket
-      - websiteUrl
+      - vpcId
 language:
   csharp:
     packageReferences:
@@ -27,7 +96,7 @@ language:
       Pulumi.Aws: 4.*
   go:
     generateResourceContainerTypes: true
-    importBasePath: github.com/pulumi/pulumi-xyz/sdk/go/xyz
+    importBasePath: github.com/pulumi/pulumi-aws-vpc/sdk/go/pulumi-aws-vpc
   nodejs:
     dependencies:
       "@pulumi/aws": "^4.0.0"
